@@ -25,8 +25,10 @@ DAE_Print:
     
     pop rax
     inc rax
+    mov rcx, [DAE_Display_Width]
+    sun rcx, DAE_Symbol_Width
     mov rbx, [DAE_X]
-    cmp rbx, DAE_Display_Width - DAE_Symbol_Width
+    cmp rbx, rcx
     jnl DAE_Print_Loop
     mov rcx, DAE_Symbol_Width + 1
     add rbx, rcx
@@ -54,15 +56,18 @@ DAE_Print:
     mov rbx, [DAE_X]
     cmp rbx, 0
     jl DAE_Print_Loop
-    mov rcx, DAE_Display_Width + 1
+    mov rcx, [DAE_Display_Width]
+    inc rcx
     sub rbx, rcx
     mov [DAE_X], rbx
     jmp DAE_Print_Loop
   
   DAE_Print_n_code:
     inc rax
+    mov rcx, [DAE_Display_Heigth]
+    sub rcx, DAE_Symbol_Height
     mov rbx, [DAE_Y]
-    cmp rbx, DAE_Display_Heigth - DAE_Symbol_Height
+    cmp rbx, rcx
     jnl DAE_Print_Loop
     mov rcx, DAE_Symbol_Height + 1
     add rbx, rcx
@@ -74,7 +79,8 @@ DAE_Print:
     mov rbx, [DAE_Y]
     cmp rbx, 0
     jl DAE_Print_Loop
-    mov rcx, DAE_Display_Heigth + 1
+    mov rcx, [DAE_Display_Heigth]
+    inc rcx
     sub rbx, rcx
     mov [DAE_Y], rbx
     jmp DAE_Print_Loop
@@ -272,15 +278,15 @@ DAE_DrawChar:
     add rcx, r10   ;x
     
   ;check out range
-    mov rbx, DAE_Display_Heigth
+    mov rbx, [DAE_Display_Heigth]
     cmp rax, rbx
     jnl DAE_DrawCharInc
-    mov rbx, DAE_Display_Width
+    mov rbx, [DAE_Display_Width]
     cmp rcx, rbx
     jnl DAE_DrawCharInc
   
   ;calc address pixel
-    mov rbx, DAE_Display_Width
+    mov rbx, [DAE_Display_Width]
     mul rbx
     add rax, rcx
     mov rbx, 4                   ;1 pixel - 4 bytes, argb
