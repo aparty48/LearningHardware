@@ -58,8 +58,10 @@ EFI_GetGraphicInterfase:
     mov rcx, [rcx + 0x18] ;EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE
     mov rbx, [rcx + 0x18] ;EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE_FRAMEBUFFERBASE
     mov [EFI_FB], rbx
-    mov rcx, [rcx + 0x20] ;EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE_FRAMEBUFFERSIZE
-    mov [EFI_FBS], rcx
+    mov rbx, [rcx + 0x20] ;EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE_FRAMEBUFFERSIZE
+    mov [EFI_FBS], rbx
+    mov rbx, [rcx + 0x8]
+    mov [EFI_GOP_Mode_Info], rbx
     ret
 ; ----------------------------------------------------------------------------------------------------------------------------  
 EFI_GetMapMemory:
@@ -161,6 +163,7 @@ EFI_Msg_GetMemoryMap              db __utf16__ `GetMemoryMap code: \0`
 EFI_Msg_AllocPool                 db __utf16__ `AllocPool code: \0`
 EFI_Msg_ExitBootServices          db __utf16__ `ExitBootServices code: \0`
 EFI_RSP                           dq 0
+EFI_GOP_Mode_Info                 dq 0
     
 ; EFI_Consts -------------------------------------------------
 ; Define the needed EFI constants and offsets here.
