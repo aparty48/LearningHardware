@@ -167,12 +167,18 @@ CODE:
         mov rcx, [EFI_FBS]
         mov [DAE_FrameBufferSize], rcx
         mov rcx, [EFI_GOP_Mode_Info]
-        mov rbx, [rcx + 0]
-        mov [DAE_Display_Height], rbx
-        mov rbx, [rcx + 4]
-        mov [DAE_Display_Width], rbx
-        
-        
+        xor rbx, rbx
+        mov ebx, [rcx + 4]
+        mov [DAE_Display_Heigth + 4], ebx
+        mov ebx, [rcx + 8]
+        mov [DAE_Display_Width + 4], ebx
+        mov ebx, [rcx + 12]
+        mov [DAE_Display_PixelFormat], ebx
+        mov ebx, [rcx + 16]
+        mov [DAE_Display_PixelInfo], ebx
+        mov ebx, [rcx + 20]
+        mov [DAE_Display_PixelPerScanLine], ebx
+
         mov ebx, 0xff4c8db0
         call DAE_FillDisplay
         
