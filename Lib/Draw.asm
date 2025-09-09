@@ -26,7 +26,7 @@ DAE_Print:
     pop rax
     inc rax
     mov rcx, [DAE_Display_Width]
-    sun rcx, DAE_Symbol_Width
+    sub rcx, DAE_Symbol_Width
     mov rbx, [DAE_X]
     cmp rbx, rcx
     jnl DAE_Print_Loop
