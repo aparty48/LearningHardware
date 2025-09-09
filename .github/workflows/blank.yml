@@ -1,0 +1,30 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install NASM
+      run: sudo apt-get update && sudo apt-get install -y nasm
+
+    - name: Run build script
+      run: ./build.sh  
+
+    - name: Upload compiled utility
+      uses: actions/upload-artifact@v3
+      with:
+        name: BOOTX64.EFI  
+        path: ./BOOTX64.efi        
+        
