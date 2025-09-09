@@ -108,11 +108,11 @@ SECTION_HEADERS:
         .virtual_address            dd CODE_RVA
         .size_of_raw_data           dd FILE_CODE_SECTIONS_COUNT * FILE_ALIGNMENT
         .pointer_to_raw_data        dd CODE - START
-        .pointer_to_relocations     dd 0                                    ; Set to 0 for executable images
-        .pointer_to_line_numbers    dd 0                                    ; There are no COFF line numbers
-        .number_of_relocations      dw 0                                    ; Set to 0 for executable images
-        .number_of_line_numbers     dw 0                                    ; Should be 0 for images
-        .characteristics            dd 0x70000020                           ; Need to read up more on this
+        .pointer_to_relocations     dd 0                ; Set to 0 for executable images
+        .pointer_to_line_numbers    dd 0                ; There are no COFF line numbers
+        .number_of_relocations      dw 0                ; Set to 0 for executable images
+        .number_of_line_numbers     dw 0                ; Should be 0 for images
+        .characteristics            dd 0x70000020       ; Need to read up more on this
 
     SECTION_DATA:
         .name                       db ".data", 0x00, 0x00, 0x00
@@ -166,6 +166,12 @@ CODE:
         mov [DAE_FrameBuffer], rcx
         mov rcx, [EFI_FBS]
         mov [DAE_FrameBufferSize], rcx
+        mov rcx, [EFI_GOP_Mode_Info]
+        mov rbx, [rcx + 0]
+        mov [DAE_Display_Height], rbx
+        mov rbx, [rcx + 4]
+        mov [DAE_Display_Width], rbx
+        
         
         mov ebx, 0xff4c8db0
         call DAE_FillDisplay
