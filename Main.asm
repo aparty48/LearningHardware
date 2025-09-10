@@ -156,8 +156,6 @@ CODE:
         lea rdx, [EFI_Start]
         call EFI_WriteText
         add rsp, 6*8+8
-        A:
-        jmp A
         
         call EFI_GetGraphicInterfase
         
