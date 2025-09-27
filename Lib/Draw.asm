@@ -286,7 +286,8 @@ DAE_DrawChar:
     jnl DAE_DrawCharInc
   
   ;calc address pixel
-    mov rbx, [DAE_Display_Width]
+    xor rbx, rbx
+    mov ebx, [DAE_Display_Width]
     mul rbx
     add rax, rcx
     mov rbx, 4                   ;1 pixel - 4 bytes, argb

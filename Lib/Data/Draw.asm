@@ -11,7 +11,7 @@ DAE_Display_Heigth            dq 640
 DAE_Display_Width             dq 800
 DAE_Display_PixelFormat       dd 0
 DAE_Display_PixelInfo         dd 0
-DAE_Display_PixelPerScanLine  dd 0
+DAE_Display_PixelPerScanLine  dd 1024
 
 DAE_Chars:
   %include "CharsTable.asm"

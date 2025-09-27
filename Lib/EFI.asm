@@ -61,8 +61,81 @@ EFI_GetGraphicInterfase:
     mov rbx, [rcx + 0x20] ;EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE_FRAMEBUFFERSIZE
     mov [EFI_FBS], rbx
     mov rbx, [rcx + 0x8]
-    mov [EFI_GOP_Mode_Info], rbx
+    mov [EFI_GOP_Mode_Info_Structure], rbx
     ret
+; ----------------------------------------------------------------------------------------------------------------------------
+EFI_Find_Set_Graphic_Mode:
+  mov rax, [EFI_Interface_GOP]
+  mov rax, [rax + 0x18]
+  mov [EFI_GOP_Mode], rax	
+  
+  EFI_Find_Set_Graphic_Mode_Loop:
+    xor rax, rax
+    xor rbx, rbx
+    mov rcx, [EFI_GOP_Mode]
+    mov eax, [rcx]                      ; get total number of available modes
+    mov ebx, [EFI_GOP_Number_Of_Mode]
+    cmp ebx, eax
+    jae EFI_Find_Set_Graphic_Mode_End
+    
+    xor rdx, rdx
+    mov edx, [EFI_GOP_Number_Of_Mode]
+    call EFI_Query_Mode
+    cmp rax, EFI_SUCCESS
+    jne EFI_Find_Set_Graphic_Mode_Loop_Inc
+    
+    mov rdx, [EFI_GOP_Mode_Info_Structure]
+    xor rax, rax
+    mov eax, [rdx + 0x4]
+    xor rbx, rbx
+    mov ebx, [rdx + 0x8]
+    mul rbx
+    cmp rax, [EFI_GOP_Max_Area]
+    jna EFI_Find_Set_Graphic_Mode_Loop_Inc
+    
+    mov [EFI_GOP_Max_Area], rax
+    mov edx, [EFI_GOP_Number_Of_Mode]
+    mov [EFI_GOP_Max_Area_Number], edx
+    
+    EFI_Find_Set_Graphic_Mode_Loop_Inc:
+      inc dword [EFI_GOP_Number_Of_Mode]
+      jmp EFI_Find_Set_Graphic_Mode_Loop
+  
+  EFI_Find_Set_Graphic_Mode_End:
+    ; set mode
+    mov rcx, [EFI_Interface_GOP]
+    mov rdx, [EFI_GOP_Max_Area_Number]
+    call [rcx + 0x8]
+    cmp rax, EFI_SUCCESS
+    je EFI_Find_Set_Graphic_Mode_End_ret
+    push rax
+    lea rdx, [EFI_Msg_GOP_SetMode] 
+    call EFI_WriteText 
+    pop rax
+    call WriteEfiCode   
+    lea rdx, [EFI_NewLine]
+    call EFI_WriteText
+    jmp $
+    
+    EFI_Find_Set_Graphic_Mode_End_ret:
+      mov rax, [EFI_Interface_GOP]
+      mov rax, [rax + 0x18]
+      mov [EFI_GOP_Mode], rax
+      mov rbx, [rax + 0x18]
+      mov [EFI_FB], rbx
+      mov rbx, [rax + 0x20]
+      mov [EFI_FBS], rbx
+      ret
+; ----------------------------------------------------------------------------------------------------------------------------
+EFI_Query_Mode:
+  ;rdx - number of mode
+  mov [EFI_RSP], rsp
+  mov rcx, [EFI_Interface_GOP]
+  lea r8, [EFI_GOP_Mode_Info_Size]
+  lea r9, [EFI_GOP_Mode_Info_Structure]
+  call [rcx]
+  mov rsp, [EFI_RSP]
+  ret
 ; ----------------------------------------------------------------------------------------------------------------------------  
 EFI_GetMapMemory:
   mov rbx, [EFI_BOOTSERVICES]
@@ -145,25 +218,33 @@ EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID db 0xde, 0xa9, 0x42, 0x90, 0xdc, 0x23, 0x38, 0
 EFI_IMAGE_HANDLE                  dq 0x00                                     ; EFI will give use this in rcx
 EFI_SYSTEM_TABLE                  dq 0x00                                     ; And this in rdx
 EFI_BOOTSERVICES                  dq 0
-EFI_Interface_GOP                 dq 0
 EFI_MemMapSize                    dq 0
 EFI_MemMapKey                     dq 0
 EFI_MemMapDescSize                dq 0
 EFI_MemMapDescVer                 dq 0
 EFI_MemMapPointer                 dq 0
-EFI_FB                            dq 0
-EFI_FBS                           dq 0
 EFI_Codes:                        db __utf16__ `0123456789ABCDEFGHIJKLMNOPTRSUVWXYZ\r\0`
 EFI_Code:                         db __utf16__ `\0\0`
 EFI_NewLine                       db __utf16__ `\n\r\0`
 EFI_Start                         db __utf16__ `EFI app started! \0`
 EFI_Msg_AllocatePages             db __utf16__ `AllocatePages code: \0`
 EFI_Msg_GetGraphicInterfase       db __utf16__ `GetGraphicInterfase code: \0`
+EFI_Msg_GOP_SetMode               db __utf16__ `GOP Set Mode code: \0`
 EFI_Msg_GetMemoryMap              db __utf16__ `GetMemoryMap code: \0`
 EFI_Msg_AllocPool                 db __utf16__ `AllocPool code: \0`
 EFI_Msg_ExitBootServices          db __utf16__ `ExitBootServices code: \0`
 EFI_RSP                           dq 0
-EFI_GOP_Mode_Info                 dq 0
+EFI_Interface_GOP                 dq 0
+EFI_GOP_Mode                      dq 0
+EFI_GOP_Number_Of_Mode            dd 0
+EFI_GOP_Max_Area                  dq 0
+EFI_GOP_Max_Area_Number           dd 0
+EFI_FB                            dq 0
+EFI_FBS                           dq 0
+;EFI_GOP_Mode_Info                 dq 0
+EFI_GOP_Version                   dq 0, 0
+EFI_GOP_Mode_Info_Size            dq 0
+EFI_GOP_Mode_Info_Structure       dq 0
     
 ; EFI_Consts -------------------------------------------------
 ; Define the needed EFI constants and offsets here.

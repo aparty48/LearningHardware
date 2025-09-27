@@ -158,27 +158,74 @@ CODE:
         add rsp, 6*8+8
         
         call EFI_GetGraphicInterfase
+        call EFI_Find_Set_Graphic_Mode
+        mov rdx, [EFI_GOP_Mode]
+        xor rbx, rbx
+        mov ebx, [rdx + 0x4]
+        call EFI_Query_Mode
         
         ; Move addresses from EFI data to DAE data
         mov rcx, [EFI_FB]
         mov [DAE_FrameBuffer], rcx
         mov rcx, [EFI_FBS]
         mov [DAE_FrameBufferSize], rcx
-        mov rcx, [EFI_GOP_Mode_Info]
+
+        mov ebx, 0xff4c8db0
+        call DAE_FillDisplay
+        
+        mov rcx, [EFI_GOP_Mode_Info_Structure]
         xor rbx, rbx
         mov ebx, [rcx + 4]
         mov [DAE_Display_Heigth + 4], ebx
         mov ebx, [rcx + 8]
         mov [DAE_Display_Width + 4], ebx
-        mov ebx, [rcx + 12]
+        mov ebx, [rcx + 0x0C]
         mov [DAE_Display_PixelFormat], ebx
-        mov ebx, [rcx + 16]
+        mov ebx, [rcx + 0x10]
         mov [DAE_Display_PixelInfo], ebx
-        mov ebx, [rcx + 20]
+        mov ebx, [rcx + 0x14]
         mov [DAE_Display_PixelPerScanLine], ebx
-
-        mov ebx, 0xff4c8db0
-        call DAE_FillDisplay
+        
+        
+        mov rcx, [EFI_GOP_Mode_Info_Structure]
+        xor rax, rax
+        mov eax, [rcx + 0x4]
+        call DAE_Convert_DQ_To_HEX_Text
+        lea rax, [DAE_HEX_Text]
+        call DAE_Print
+        
+        mov rcx, [EFI_GOP_Mode_Info_Structure]
+        mov qword [DAE_Y], 7
+        xor rax, rax
+        mov eax, [rcx + 0x8]
+        call DAE_Convert_DQ_To_HEX_Text
+        lea rax, [DAE_HEX_Text]
+        call DAE_Print
+        
+        mov rcx, [EFI_GOP_Mode_Info_Structure]
+        mov qword [DAE_Y], 14
+        xor rax, rax
+        mov eax, [rcx + 0x0C]
+        call DAE_Convert_DQ_To_HEX_Text
+        lea rax, [DAE_HEX_Text]
+        call DAE_Print
+        
+        mov rcx, [EFI_GOP_Mode_Info_Structure]
+        mov qword [DAE_Y], 21
+        xor rax, rax
+        mov eax, [rcx + 0x10]
+        call DAE_Convert_DQ_To_HEX_Text
+        lea rax, [DAE_HEX_Text]
+        call DAE_Print
+        
+        mov rcx, [EFI_GOP_Mode_Info_Structure]
+        mov qword [DAE_Y], 28
+        xor rax, rax
+        mov eax, [rcx + 0x14]
+        call DAE_Convert_DQ_To_HEX_Text
+        lea rax, [DAE_HEX_Text]
+        call DAE_Print
+        jmp $
         
         mov rax, Core_END - Core
         call DAE_Convert_DQ_To_HEX_Text
