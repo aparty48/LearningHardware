@@ -22,13 +22,13 @@ jobs:
     - name: Run build script
       run: ./build.sh  
 
-    - name: Upload compiled utility
+    - name: Upload BOOTX64.EFI
       uses: actions/upload-artifact@v4
       with:
         name: BOOTX64.EFI  
         path: ./out/EFI/BOOT/BOOTX64.EFI
         
-    - name: Upload compiled utility
+    - name: Upload OS.img
       uses: actions/upload-artifact@v4
       with:
         name: OS.img  
