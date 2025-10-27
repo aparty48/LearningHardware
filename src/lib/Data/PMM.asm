@@ -1,10 +1,18 @@
 ; Memory data ----------------------------------------------------------------------
-MEM_Mes_1:                             db "os can work with defalut (1 version) descriptor version EFI only, current version: ", 0
-MEM_Mes_2:                             db "os can work with (48 bit) descriptor size EFI only, current size: ", 0
-MEM_Mes_3:                             db 13, 10, 0
-MEM_Mes_4:                             db " ", 0
+PMM_Mes_1:                             db "os can work with defalut (1 version) descriptor version EFI only, current version: ", 0
+PMM_Mes_2:                             db "os can work with (48 bit) descriptor size EFI only, current size: ", 0
+PMM_Mes_3:                             db 13, 10, 0
+PMM_Mes_4:                             db " ", 0
 
-; Constants ----------------------------------------------------
+; Constants ---------------------------------------------------------------
+
+;---------------------------------------------------------------------------------------
+; Версия 1 карты PMM:
+; Карта это масив дкскрипторов
+; PMM descriptor structure -------------------------------------------------
+; 8 bytes - Physical start address
+; 8 bytes - Number of pages
+; 4 bytes - Type
 
 ; EFI descriptor structure ------------------------------------------------
 ; 48 byte efi mem map descriptor:
@@ -39,3 +47,5 @@ EfiUnusableMemory         equ 8   ; cant use
 EfiACPIReclaimMemory      equ 9   ; can use, after init ACPI
 EfiACPIMemoryNVS          equ 10  ; cant use
 EfiMemoryMappedIO         equ 11  ; cant use, as default memory
+
+

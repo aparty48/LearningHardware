@@ -287,7 +287,7 @@ DAE_DrawChar:
   
   ;calc address pixel
     xor rbx, rbx
-    mov ebx, [DAE_Display_Width]
+    mov ebx, [DAE_Display_PixelPerScanLine]    ;change DAE_Display_Width on DAE_Display_PixelPerScanLine if not work first display
     mul rbx
     add rax, rcx
     mov rbx, 4                   ;1 pixel - 4 bytes, argb

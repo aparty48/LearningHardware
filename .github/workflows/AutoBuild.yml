@@ -26,5 +26,11 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: BOOTX64.EFI  
-        path: ./BOOTX64.EFI
+        path: ./out/BOOTX64.EFI
+        
+    - name: Upload compiled utility
+      uses: actions/upload-artifact@v4
+      with:
+        name: OS.img  
+        path: ./OS.img
         

@@ -1,63 +1,20 @@
-MEM_Copy_Pages:
-  ;Input
-  ;rax - address source
-  ;rbx - address destination
-  ;rcx - count pages
-  MEM_Copy_Pages_end:
-    ret
-;---------------------------------------------------
-MEM_Copy_Bytes:
-  ;Input
-  ;rax - address source
-  ;rbx - address destination
-  ;rcx - count bytes
-  ;Used
-  ;rdx - 
-  
-  dec rcx
-  
-  MEM_Copy_Bytes_loop:
-    mov dl, [rax + rcx]
-    mov [rbx + rcx], dl
-    dec rcx
-    jnz MEM_Copy_Bytes_loop
-    
-    mov dl, [rax]
-    mov [rbx], dl
-    
-  MEM_Copy_Bytes_end:
-    ret
-;----------------------------------------------------
-MEM_Calc_Needed_Pages_From_Count_Bytes:
-  ;Input: 
-  ;rax - count bytes
-  ;Output
-  ;rax - count pages
-  ;Used:
-  ;rax, rcx, rdx
-  add rax, Page_Size - 1
-  xor rdx, rdx
-  mov rcx, Page_Size
-  div rcx
-  ret
-;--------------------------------------------------
-MEM_Read_EFI_MemMap:
+PMM_Init:
   ;Input:
   ;rax - descriptor size
   ;rbx - discriptor version
   ;rcx - pointer on map
   ;rdx - size of map in bytes
-  MEM_REMM_start:
+  PMM_Init_start:
     push rcx
     push rdx
-    call MEM_CheckVersionOf_EFI_MEMMAP
+    call PMM_CheckVersionOf_EFI_PMMMAP
     pop rdx
     pop rcx
     xor rbx, rbx
     cmp r8, rbx
-    jne MEM_REMM_end
+    jne PMM_Init_end
     
-  MEM_REMM_calc_count_elements:
+  PMM_Init_calc_count_elements:
     mov rbx, 48
     mov rax, rdx
     xor rdx, rdx
@@ -71,20 +28,20 @@ MEM_Read_EFI_MemMap:
   xor r8, r8
   mov r10, 7
   
-  MEM_REMM_loop:
-    MEM_REMM_loop_check:
+  PMM_Init_loop:
+    PMM_Init_loop_check:
       cmp r8, rbx
-      jnl MEM_REMM_end
+      jnl PMM_Init_end
       
-    MEM_REMM_loop_body:
-      MEM_REMM_loop_calc_address_descriptor:
+    PMM_Init_loop_body:
+      PMM_Init_loop_calc_address_descriptor:
         mov r9, 48
         xor rdx, rdx
         mov rax, r8
         mul r9
         add rax, rcx
         
-      MEM_REMM_loop_a:
+      PMM_Init_loop_a:
         push rbx
         push rcx
         push r8
@@ -93,7 +50,7 @@ MEM_Read_EFI_MemMap:
         call DAE_Convert_DQ_To_HEX_Text
         lea rax, [DAE_HEX_Text]
         call DAE_Print
-        lea rax, [MEM_Mes_4]
+        lea rax, [PMM_Mes_4]
         call DAE_Print
         pop r10
         pop r8
@@ -101,28 +58,31 @@ MEM_Read_EFI_MemMap:
         pop rbx
         
         dec r10
-        jnz MEM_REMM_loop_end
+        jnz PMM_Init_loop_end
         push rbx
         push rcx
         push r8
         push r10
-        lea rax, [MEM_Mes_3]
+        lea rax, [PMM_Mes_3]
         call DAE_Print
         pop r10
         pop r8
         pop rcx
         pop rbx
         mov r10, 7
+        
+      PMM_Init_loop_b:
+        
       
-    MEM_REMM_loop_end:
+    PMM_Init_loop_end:
       inc r8
-      jmp MEM_REMM_loop
+      jmp PMM_Init_loop
     
     
-  MEM_REMM_end:
+  PMM_Init_end:
     ret
 ;-------------------------------------------------------------------
-MEM_CheckVersionOf_EFI_MEMMAP:
+PMM_CheckVersionOf_EFI_PMMMAP:
   ;Input:
   ;rax - descriptor size
   ;rbx - descriptor version
@@ -132,45 +92,51 @@ MEM_CheckVersionOf_EFI_MEMMAP:
   xor r8, r8
   push r8
   
-  MEM_CVEMM_ver_0:
+  PMM_CVEMM_ver_0:
     cmp rbx, 0
-    je MEM_CVEMM_size
-  MEM_CVEMM_ver_1:
+    je PMM_CVEMM_size
+  PMM_CVEMM_ver_1:
     cmp rbx, 1
-    je MEM_CVEMM_size
+    je PMM_CVEMM_size
     
-  MEM_CVEMM_ver_err:
+  PMM_CVEMM_ver_err:
     inc qword [rsp]
     inc qword [rsp]
     push rax
     push rbx
-    lea rax, [MEM_Mes_1]
+    lea rax, [PMM_Mes_1]
     call DAE_Print
     pop rax
     call DAE_Convert_DQ_To_HEX_Text
     lea rax, [DAE_HEX_Text]
     call DAE_Print
-    lea rax, [MEM_Mes_3]
+    lea rax, [PMM_Mes_3]
     call DAE_Print
     pop rax
   
-  MEM_CVEMM_size:
+  PMM_CVEMM_size:
     cmp rax, 48
-    je MEM_CVEMM_end
+    je PMM_CVEMM_end
     inc qword [rsp]
     push rax
-    lea rax, [MEM_Mes_2]
+    lea rax, [PMM_Mes_2]
     call DAE_Print
     pop rax
     call DAE_Convert_DQ_To_HEX_Text
     lea rax, [DAE_HEX_Text]
     call DAE_Print
-    lea rax, [MEM_Mes_3]
+    lea rax, [PMM_Mes_3]
     call DAE_Print
     
-  MEM_CVEMM_end:
+  PMM_CVEMM_end:
     pop r8
     ret
     
-
-
+;--------------------------------------------------------------------------------------
+PMM_Allocate_Pages:
+  ; Input
+  ; rax - count pages
+  ; rbx - type page
+  ret
+PMM_Free_Pages:
+  ret

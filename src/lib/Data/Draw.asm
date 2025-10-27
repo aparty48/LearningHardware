@@ -14,7 +14,7 @@ DAE_Display_PixelInfo         dd 0
 DAE_Display_PixelPerScanLine  dd 1024
 
 DAE_Chars:
-  %include "CharsTable.asm"
+  %include "src/CharsTable.asm"
 
 DAE_Display_Symbols_Heigth    equ 91
 DAE_Display_Symbols_Width     equ 160
