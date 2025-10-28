@@ -6,9 +6,10 @@ Code:
   Core_Init:
     ;init new stack
     mov rbx, [rax + 0x3A]
-    mov [Core_Stack_Physical_Address], rbx
-    mov rsp, [Core_Stack_Physical_Address]
+    mov [Core_Stack_Physical_Address_Start], rbx
+    mov rsp, [Core_Stack_Physical_Address_Start]
     add rsp, Core_Stack_Size_In_Pages * Page_Size
+    mov [Core_Stack_Physical_Address_End], rsp
     
     ;save pointer to init data structure
     push rax
@@ -16,23 +17,22 @@ Code:
     mov ebx, 0xffa8b17c
     call DAE_FillDisplay
     
-    mov qword[DAE_X], 200
-    mov qword[DAE_Y], 200
-    lea rax, [Core_Msg_Initing]
-    call DAE_Print
+    lea rbx, [Core_Msg_Initing]
+    call COM_Print
     
-    mov r8, [rsp]                                                                      ; get address init data structure from stack
+    mov r8, [Core_Stack_Physical_Address_End]                                          ; get address end of stack
+    sub r8, 8                                                                          ; calc init data structure from stack
+    mov r8, [r8]                                                                       ; get from stack
     mov rbx, [r8 + 0x2]                                                                ; UEFI memory map descriptor version 
     mov rax, [r8 + 0xA]                                                                ; memory map descriptor size 
     mov rcx, [r8 + 0x1A]                                                               ; pointer
     mov rdx, [r8 + 0x12]                                                               ; size map in bytes
+    mov r10, [r8 + 0x2A]                                                               ; pointer PMM map
     call PMM_Init
     
     mov ebx, 0xff6b8141
     call DAE_FillDisplay
     
-    lea rbx, [Core_Msg_Initing]
-    call COM_Print
     jmp $
     hlt
   
@@ -91,8 +91,9 @@ Data:
     ;%include "src/lib/USB.asm"
    
   Core_Physical_Address dq 0
-  Core_Stack_Physical_Address dq 0
-  Core_Msg_Initing db "Initing core...", 0
+  Core_Stack_Physical_Address_Start dq 0
+  Core_Stack_Physical_Address_End dq 0
+  Core_Msg_Initing db "Initing core...", 13, 10, 0
 Data_end:
 
 ; Padding data -------------------------------------------------

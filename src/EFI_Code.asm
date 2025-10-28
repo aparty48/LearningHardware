@@ -8,13 +8,14 @@ mov [EFI_BOOTSERVICES], rax                                     ;save result
 
 lea rdx, [EFI_Start]
 call EFI_WriteText
+
 ; Settings Graphic
 call EFI_GetGraphicInterfase
-;call EFI_Find_Set_Graphic_Mode
-;mov rdx, [EFI_GOP_Mode]
-;xor rbx, rbx
-;mov ebx, [rdx + 0x4]
-;call EFI_Query_Mode
+call EFI_Find_Set_Graphic_Mode
+mov rdx, [EFI_GOP_Mode]
+xor rbx, rbx
+mov ebx, [rdx + 0x4]
+call EFI_Query_Mode
 
 ; Move addresses from EFI data to DAE data
 mov rcx, [EFI_FB]

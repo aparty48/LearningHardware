@@ -226,7 +226,7 @@ EFI_MemMapPointer                 dq 0
 EFI_Codes:                        db __utf16__ `0123456789ABCDEFGHIJKLMNOPTRSUVWXYZ\r\0`
 EFI_Code:                         db __utf16__ `\0\0`
 EFI_NewLine                       db __utf16__ `\n\r\0`
-EFI_Start                         db __utf16__ `EFI app started! \0`
+EFI_Start                         db __utf16__ `EFI app started! \n\r\0`
 EFI_Msg_AllocatePages             db __utf16__ `AllocatePages code: \0`
 EFI_Msg_GetGraphicInterfase       db __utf16__ `GetGraphicInterfase code: \0`
 EFI_Msg_GOP_SetMode               db __utf16__ `GOP Set Mode code: \0`
