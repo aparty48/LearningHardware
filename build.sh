@@ -70,8 +70,8 @@ fi
 #xorriso -as mkisofs -o MyOS.iso -isohybrid-mbr /usr/lib/syslinux/mbr/gptmbr.bin -c boot.catalog -b EFI/boot/bootx64.efi -no-emul-boot -eltorito-alt-boot -e EFI/boot/bootx64.efi -no-emul-boot -isohybrid-gpt-basdat Out
 
 ##
-# qemu-system-x86_64 -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/OVMF.fd -hda out/MyOS.img -enable-kvm -m 512 -serial stdio -gdb tcp::1111
-# qemu-system-x86_64 -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/OVMF.fd -cdrom MyOS.iso -gdb tcp::1111 -S
+# qemu-system-x86_64 -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/OVMF.fd -hda OS.img -enable-kvm -m 512 -serial stdio -gdb tcp::1111 -S -serial tcp::2222,server,nowait
+# nc localhost 2222
 # gdb
 # target remote localhost:1111
 ##sudo

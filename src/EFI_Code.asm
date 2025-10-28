@@ -44,7 +44,7 @@ mov rax, Core_Size_In_Pages
 mov rdx, EfiRuntimeServicesData
 call EFI_AllocatePages
 mov [Temp_Core_Physical_Address], rax
-jmp $
+
 ; Allocate memory for Core Stack
 mov rax, Core_Size_In_Pages
 mov rdx, EfiRuntimeServicesData
