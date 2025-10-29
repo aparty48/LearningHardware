@@ -74,6 +74,7 @@ PMM_Init:
   ;call PMM_Clear_Empty_Regions
 
   PMM_Init_end:
+    call PMM_Init_Replace_Types
     call PMM_Print_Table_Descriptors
     call PMM_Merge_Of_Regions
     call PMM_Print_Table_Descriptors
@@ -179,14 +180,6 @@ PMM_Merge_Of_Regions:
       mov edx, [r13 + 0x10]                        ;get type from descriptor[i]
       cmp rdx, EfiConventionalMemory
       je PMM_Merge_Of_Regions_Finded_A
-      cmp rdx, EfiLoaderCode
-      je PMM_Merge_Of_Regions_Finded_A
-      cmp rdx, EfiLoaderData
-      je PMM_Merge_Of_Regions_Finded_A
-      cmp rdx, EfiBootServicesCode
-      je PMM_Merge_Of_Regions_Finded_A
-      cmp rdx, EfiBootServicesData
-      je PMM_Merge_Of_Regions_Finded_A
       jne PMM_Merge_Of_Regions_Finded_B
       
       PMM_Merge_Of_Regions_Finded_A:
@@ -202,9 +195,6 @@ PMM_Merge_Of_Regions:
         mov r9, [rax + 0x8]    ;get number of pages from merged descriptor
         add r9, rdx            ;add pages
         mov [rax + 0x8], r9    ;save to merged descriptor
-        mov edx, EfiConventionalMemory
-        mov [r13 + 0x10], edx   ;reset type descriptor[i]
-        mov [rax + 0x10], edx   ;reset type merged descriptor
         
         jmp PMM_Merge_Of_Regions_End_Loop
         
@@ -218,14 +208,6 @@ PMM_Merge_Of_Regions:
       
       cmp rdx, EfiConventionalMemory
       je PMM_Merge_Of_Regions_Not_Finded_C
-      cmp rdx, EfiLoaderCode
-      je PMM_Merge_Of_Regions_Not_Finded_C
-      cmp rdx, EfiLoaderData
-      je PMM_Merge_Of_Regions_Not_Finded_C
-      cmp rdx, EfiBootServicesCode
-      je PMM_Merge_Of_Regions_Not_Finded_C
-      cmp rdx, EfiBootServicesData
-      je PMM_Merge_Of_Regions_Not_Finded_C
       jne PMM_Merge_Of_Regions_End_Loop
       
       PMM_Merge_Of_Regions_Not_Finded_C:
@@ -238,6 +220,47 @@ PMM_Merge_Of_Regions:
     
   PMM_Merge_Of_Regions_End:
     ret
+;--------------------------------------------------------------------------------------------
+PMM_Init_Replace_Types:
+  ;rcx - counter
+  ;r8 - PMM_Address_Map
+  PMM_Init_Replace_Types_Loop_init:
+    xor rcx, rcx
+    mov rbx, [PMM_Count_Descriptors]
+    mov r8, [PMM_Address_Map]
+    mov r9, 20
+    
+  PMM_Init_Replace_Types_Loop:
+    cmp rcx, rbx
+    jnl PMM_Init_Replace_Types_end
+    
+    xor rdx, rdx
+    mov rax, rcx
+    mul r9
+    add rax, r8
+    
+    xor rdx, rdx
+    mov edx, [rax + 0x10]
+    cmp rdx, EfiLoaderCode
+    je PMM_Init_Replace_Types_Replace
+    cmp rdx, EfiLoaderData
+    je PMM_Init_Replace_Types_Replace
+    cmp rdx, EfiBootServicesCode
+    je PMM_Init_Replace_Types_Replace
+    cmp rdx, EfiBootServicesData
+    je PMM_Init_Replace_Types_Replace
+    inc rcx
+    jne PMM_Init_Replace_Types_Loop
+    
+    PMM_Init_Replace_Types_Replace:
+      mov edx, 7
+      mov [rax + 0x10], edx
+      inc rcx
+      jmp PMM_Init_Replace_Types_Loop
+      
+    PMM_Init_Replace_Types_end:
+      ret
+    
 ;--------------------------------------------------------------------------------------------
 PMM_Print_Table_Descriptors:
   PMM_Print_Table_Descriptors_Loop_init:
