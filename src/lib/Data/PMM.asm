@@ -3,6 +3,8 @@ PMM_Mes_1:                             db "os can work with defalut (1 version) 
 PMM_Mes_2:                             db "os can work with (48 bit) descriptor size EFI only, current size: ", 0
 PMM_Mes_3:                             db 13, 10, 0
 PMM_Mes_4:                             db " ", 0
+PMM_Address_Map                        dq 0
+PMM_Count_Descriptors                  dq 0
 
 ; Constants ---------------------------------------------------------------
 

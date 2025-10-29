@@ -6,6 +6,7 @@ PMM_Init:
   ;rdx - size of map in bytes
   ;r10 - address to PMM map
   PMM_Init_start:
+    mov [PMM_Address_Map], r10
     push rcx
     push rdx
     push r10
@@ -22,6 +23,8 @@ PMM_Init:
     mov rax, rdx
     xor rdx, rdx
     div rbx
+    
+    mov [PMM_Count_Descriptors], rbx
   
   ;rax - current descriptor address uefi
   ;rbx - count descriptors in map
@@ -62,56 +65,18 @@ PMM_Init:
         mov [r11 + 0x8], rdx
         mov rdx, [rax + 0x0]   ; Type
         mov [r11 + 0x10], edx
-        
-      PMM_Init_loop_a:
-        push rbx
-        push rcx
-        push r8
-        push r10
-        push r11
-        mov rax, [rsp]
-        mov rax, r11 
-        call DAE_Convert_DQ_To_HEX_Text
-        lea rbx, [DAE_HEX_Text]
-        call COM_Print
-        lea rbx, [PMM_Mes_4]
-        call COM_Print
-        mov rax, [rsp]
-        mov rax, [rax + 0x0]             ;type
-        call DAE_Convert_DQ_To_HEX_Text
-        lea rbx, [DAE_HEX_Text]
-        call COM_Print
-        lea rbx, [PMM_Mes_4]
-        call COM_Print
-        mov rax, [rsp]
-        mov rax, [rax + 0x8]             ;addr
-        call DAE_Convert_DQ_To_HEX_Text
-        lea rbx, [DAE_HEX_Text]
-        call COM_Print
-        lea rbx, [PMM_Mes_4]
-        call COM_Print
-        mov rax, [rsp]
-        mov eax, [rax + 0x10]            ;addr 
-        and rax, 0x00000000FFFFFFFF
-        call DAE_Convert_DQ_To_HEX_Text
-        lea rbx, [DAE_HEX_Text]
-        call COM_Print
-        lea rbx, [PMM_Mes_4]
-        call COM_Print
-        lea rbx, [PMM_Mes_3]
-        call COM_Print
-        pop r11
-        pop r10
-        pop r8
-        pop rcx
-        pop rbx
 
     PMM_Init_loop_end:
       inc r8
       jmp PMM_Init_loop
     
-    
+  ;call PMM_Merge_Of_Regions
+  ;call PMM_Clear_Empty_Regions
+
   PMM_Init_end:
+    call PMM_Print_Table_Descriptors
+    call PMM_Merge_Of_Regions
+    call PMM_Print_Table_Descriptors
     ret
 ;-------------------------------------------------------------------
 PMM_CheckVersionOf_EFI_PMMMAP:
@@ -171,4 +136,163 @@ PMM_Allocate_Pages:
   ; rbx - type page
   ret
 PMM_Free_Pages:
+  ; rax - address
+  ; set region as conventional memory
+  call PMM_Merge_Of_Regions
+  call PMM_Clear_Empty_Regions
+  ret
+  
+PMM_Merge_Of_Regions:
+  ; rbx - count descriptors
+  ; rcx - counter
+  ; r8 - address memory map
+  ; r10 - count descriptors
+  ; r11 - index merged descriptor
+  ; r12 - flag finded
+  ; r13 - current address descriptor[i]
+  
+  PMM_Merge_Of_Regions_Init_Loop:
+    mov r8, [PMM_Address_Map]
+    mov r10, [PMM_Count_Descriptors]
+    xor r11, r11
+    xor r12, r12
+    xor rcx, rcx
+    
+  PMM_Merge_Of_Regions_Loop:
+    PMM_Merge_Of_Regions_Loop_Check:
+      cmp rcx, r10
+      jnl PMM_Merge_Of_Regions_End
+      
+    PMM_Merge_Of_Regions_Calc_Addr_Descriptor:
+      xor rdx, rdx
+      mov rax, rcx
+      mov r9, 20                                   ; size of descriptor
+      mul r9
+      add rax, r8                                  ;calc address descriptor[i]
+      mov r13, rax
+    
+      cmp r12, 1
+      jne PMM_Merge_Of_Regions_Not_Finded
+      
+    PMM_Merge_Of_Regions_Finded:
+      xor rdx, rdx
+      mov edx, [r13 + 0x10]                        ;get type from descriptor[i]
+      cmp rdx, EfiConventionalMemory
+      je PMM_Merge_Of_Regions_Finded_A
+      cmp rdx, EfiLoaderCode
+      je PMM_Merge_Of_Regions_Finded_A
+      cmp rdx, EfiLoaderData
+      je PMM_Merge_Of_Regions_Finded_A
+      cmp rdx, EfiBootServicesCode
+      je PMM_Merge_Of_Regions_Finded_A
+      cmp rdx, EfiBootServicesData
+      je PMM_Merge_Of_Regions_Finded_A
+      jne PMM_Merge_Of_Regions_Finded_B
+      
+      PMM_Merge_Of_Regions_Finded_A:
+        xor rdx, rdx
+        mov rax, r11
+        mov r9, 20             ;size of descriptor PMM
+        mul r9
+        add rax, r8            ;calc address merged descriptor
+        
+        mov rdx, [r13 + 0x8]   ;get number of pages from descriptor[i]
+        mov r9, 0
+        mov [r13 + 0x8], r9    ;set 0, number of pages from descriptor[i]
+        mov r9, [rax + 0x8]    ;get number of pages from merged descriptor
+        add r9, rdx            ;add pages
+        mov [rax + 0x8], r9    ;save to merged descriptor
+        mov edx, EfiConventionalMemory
+        mov [r13 + 0x10], edx   ;reset type descriptor[i]
+        mov [rax + 0x10], edx   ;reset type merged descriptor
+        
+        jmp PMM_Merge_Of_Regions_End_Loop
+        
+      PMM_Merge_Of_Regions_Finded_B:
+        mov r12, 0
+        jmp PMM_Merge_Of_Regions_End_Loop
+      
+    PMM_Merge_Of_Regions_Not_Finded:
+      xor rdx, rdx
+      mov edx, [r13 + 0x10]                        ;get type from descriptor[i]
+      
+      cmp rdx, EfiConventionalMemory
+      je PMM_Merge_Of_Regions_Not_Finded_C
+      cmp rdx, EfiLoaderCode
+      je PMM_Merge_Of_Regions_Not_Finded_C
+      cmp rdx, EfiLoaderData
+      je PMM_Merge_Of_Regions_Not_Finded_C
+      cmp rdx, EfiBootServicesCode
+      je PMM_Merge_Of_Regions_Not_Finded_C
+      cmp rdx, EfiBootServicesData
+      je PMM_Merge_Of_Regions_Not_Finded_C
+      jne PMM_Merge_Of_Regions_End_Loop
+      
+      PMM_Merge_Of_Regions_Not_Finded_C:
+        mov r12, 1           ;set flag
+        mov r11, rcx         ;save index finded merged descriptor
+    
+  PMM_Merge_Of_Regions_End_Loop:
+    inc rcx
+    jmp PMM_Merge_Of_Regions_Loop
+    
+  PMM_Merge_Of_Regions_End:
+    ret
+;--------------------------------------------------------------------------------------------
+PMM_Print_Table_Descriptors:
+  PMM_Print_Table_Descriptors_Loop_init:
+    xor rcx, rcx
+    mov rbx, [PMM_Count_Descriptors]
+    
+  PMM_Print_Table_Descriptors_Loop:
+    cmp rcx, rbx
+    jnl PMM_Print_Table_Descriptors_end
+    
+    xor rdx, rdx
+    mov r9, 20
+    mov rax, rcx
+    mul r9
+    mov r9, [PMM_Address_Map]
+    add rax, r9
+    
+    push rbx
+    push rcx
+    push rax
+    mov rax, [rsp]
+    mov rax, [rax + 0x0]             ;type
+    call DAE_Convert_DQ_To_HEX_Text
+    lea rbx, [DAE_HEX_Text]
+    call COM_Print
+    lea rbx, [PMM_Mes_4]
+    call COM_Print
+    mov rax, [rsp]
+    mov rax, [rax + 0x8]             ;num
+    call DAE_Convert_DQ_To_HEX_Text
+    lea rbx, [DAE_HEX_Text]
+    call COM_Print
+    lea rbx, [PMM_Mes_4]
+    call COM_Print
+    mov rax, [rsp]
+    mov eax, [rax + 0x10]            ;addr 
+    and rax, 0xFFFFFFFF
+    call DAE_Convert_DQ_To_HEX_Text
+    lea rbx, [DAE_HEX_Text]
+    call COM_Print
+    lea rbx, [PMM_Mes_4]
+    call COM_Print
+    lea rbx, [PMM_Mes_3]
+    call COM_Print
+    pop rax
+    pop rcx
+    pop rbx
+    
+    inc rcx
+    jmp PMM_Print_Table_Descriptors_Loop
+    
+  PMM_Print_Table_Descriptors_end:
+    lea rbx, [PMM_Mes_3]
+    call COM_Print
+    ret
+;--------------------------------------------------------------------------------------------
+PMM_Clear_Empty_Regions:
   ret
