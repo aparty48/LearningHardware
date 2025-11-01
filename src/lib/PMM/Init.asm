@@ -5,8 +5,10 @@ PMM_Init:
   ;rcx - pointer on map
   ;rdx - size of map in bytes
   ;r10 - address to PMM map
+  ;r11 - Size PMM map in pages
   PMM_Init_start:
     mov [PMM_Address_Map], r10
+    mov [PMM_Size_Map_In_Pages], r11
     push rcx
     push rdx
     push r10
@@ -69,14 +71,13 @@ PMM_Init:
     PMM_Init_loop_end:
       inc r8
       jmp PMM_Init_loop
-    
-  ;call PMM_Merge_Of_Regions
-  ;call PMM_Clear_Empty_Regions
 
   PMM_Init_end:
     call PMM_Init_Replace_Types
     call PMM_Print_Table_Descriptors
     call PMM_Merge_Of_Regions
+    call PMM_Print_Table_Descriptors
+    call PMM_Clear_Empty_Regions
     call PMM_Print_Table_Descriptors
     ret
 ;-------------------------------------------------------------------

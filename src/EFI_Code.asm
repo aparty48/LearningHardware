@@ -95,13 +95,7 @@ mov rbx, [EFI_MemMapSize]
 mov [rax + 0x12], rbx
 mov rbx, [EFI_MemMapPointer]
 mov [rax + 0x1A], rbx
-mov r8, rax                                        ; calc size PMM map
-xor rdx, rdx
-mov rax, [Temp_Size_MemMap_In_Pages]
-mov rbx, Page_Size
-mul rbx
-mov rbx, rax
-mov rax, r8
+mov rbx, [Temp_Size_MemMap_In_Pages]
 mov [rax + 0x22], rbx                              ; size PMM map
 mov rbx, [Temp_Pointer_PMM_Map]
 mov [rax + 0x2A], rbx                              ; pointer PMM map

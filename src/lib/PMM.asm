@@ -1,3 +1,4 @@
+%include "src/lib/PMM/Clear_Empty_Regions.asm"
 %include "src/lib/PMM/Init.asm" 
 %include "src/lib/PMM/Merge_Of_Regions.asm"
 %include "src/lib/PMM/Print_Table_Descriptors.asm"
@@ -17,5 +18,4 @@ PMM_Free_Pages:
 
 ;--------------------------------------------------------------------------------------------
 ;--------------------------------------------------------------------------------------------
-PMM_Clear_Empty_Regions:
-  ret
+

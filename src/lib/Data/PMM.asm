@@ -5,6 +5,7 @@ PMM_Mes_3:                             db 13, 10, 0
 PMM_Mes_4:                             db " ", 0
 PMM_Address_Map                        dq 0
 PMM_Count_Descriptors                  dq 0
+PMM_Size_Map_In_Pages                  dq 0
 
 ; Constants ---------------------------------------------------------------
 
