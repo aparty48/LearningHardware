@@ -37,18 +37,30 @@ Code:
     mov rax, 0x800
     mov rbx, 0xf0
     call PMM_Allocate_Pages
+    push rax
     call PMM_Print_Table_Descriptors
     mov rax, 0x200
     mov rbx, 0xf1
     call PMM_Allocate_Pages
+    push rax
     call PMM_Print_Table_Descriptors
     mov rax, 0x200
     mov rbx, 0xf2
     call PMM_Allocate_Pages
+    push rax
     call PMM_Print_Table_Descriptors
     mov rax, 0x200
     mov rbx, 0xf3
     call PMM_Allocate_Pages
+    push rax
+    call PMM_Print_Table_Descriptors
+    
+    mov rax, [rsp + 24]
+    call PMM_Free_Pages
+    call PMM_Print_Table_Descriptors
+    
+    pop rax 
+    call PMM_Free_Pages
     call PMM_Print_Table_Descriptors
     
     mov ebx, 0xff782317
