@@ -27,6 +27,20 @@ PMM_Size_Map_In_Pages                  dq 0
 ; 8 bytes - Attribute
 ; 8 bytes - empety, padding, align
 
+; PMM Types of descriptors ------------------------------------------------
+PMMReservedMemoryType     equ 0   ; cant use
+;                          equ 1   ; can use
+;                          equ 2   ; can use
+;                          equ 3   ; can use
+;                          equ 4   ; can use
+PMMRuntimeServicesCode    equ 5   ; cant use
+PMMRuntimeServicesData    equ 6   ; cant use
+PMMConventionalMemory     equ 7   ; can use
+PMMUnusableMemory         equ 8   ; cant use
+PMMACPIReclaimMemory      equ 9   ; can use, after init ACPI
+PMMACPIMemoryNVS          equ 10  ; cant use
+PMMMemoryMappedIO         equ 11  ; cant use, as default memory
+
 ; EFI desc attributes ------------------------------------------------
 EFI_MEMORY_UC             equ 0x1                   ;Uncacheable
 EFI_MEMORY_WC             equ 0x2                   ;Write coalescing
