@@ -34,41 +34,36 @@ Code:
     mov ebx, 0xff6b8141
     call DAE_FillDisplay
     
-    mov rax, 0x800
-    mov rbx, 0xf0
-    call PMM_Allocate_Pages
-    push rax
-    call PMM_Print_Table_Descriptors
-    mov rax, 0x200
-    mov rbx, 0xf1
-    call PMM_Allocate_Pages
-    push rax
-    call PMM_Print_Table_Descriptors
-    mov rax, 0x200
-    mov rbx, 0xf2
-    call PMM_Allocate_Pages
-    push rax
-    call PMM_Print_Table_Descriptors
-    mov rax, 0x200
-    mov rbx, 0xf3
-    call PMM_Allocate_Pages
-    push rax
-    call PMM_Print_Table_Descriptors
+    ;check cpu vendor
+    call CPUID_Where_i_am_launched
+    cmp rax, 1
+    jne Core_I_dont_know_this_CPU_Vendor
     
-    mov rax, [rsp + 24]
-    call PMM_Free_Pages
-    call PMM_Print_Table_Descriptors
-    
-    pop rax 
-    call PMM_Free_Pages
-    call PMM_Print_Table_Descriptors
-    
-    mov ebx, 0xff782317
-    call DAE_FillDisplay
+    ;mov ebx, 0xff782317
+    ;call DAE_FillDisplay
     
     jmp $
     hlt
+;--------------------------------------------------------------------
+Core_I_dont_know_this_CPU_Vendor:
+  lea rbx, [Core_I_dont_know_this_CPU_Vendor_Msg]
+  call COM_Print
   
+  xor rax, rax
+  cpuid
+  
+  sub rsp, 16
+  mov [rsp], ebx
+  mov [rsp + 4], edx
+  mov [rsp + 8], ecx
+  mov byte [rsp + 12], 0
+  
+  mov rbx, rsp
+  call COM_Print
+  
+  jmp $          
+  hlt
+;--------------------------------------------------------------------
   COM_Print:
     ;rbx - pointer to massage
     ;Used: r8, rdx, rax
@@ -92,10 +87,14 @@ Code:
     COM_Print_end: 
       ret
     
+  CPUID_code:
+    %include "src/lib/CPUID/CPUID.asm"
   Memory_code:
     %include "src/lib/Memory.asm"
   PMM_code:
     %include "src/lib/PMM.asm"
+  VMM_code:
+    %include "src/lib/VMM/VMM.asm"
   PCI_Lib:
     %include "src/lib/PCI.asm"
   USB_Lib:
@@ -112,10 +111,14 @@ Times Code_Padding db 0
 ;-----------------------------------------------------
 
 Data:
+  CPUID_data:
+    %include "src/lib/Data/CPUID.asm"
   Memory_data:
     %include "src/lib/Data/Memory.asm"
   PMM_data:
     %include "src/lib/Data/PMM.asm"
+  VMM_data:
+    %include "src/lib/Data/VMM.asm"
   Draw_data: 
     %include "src/lib/Data/Draw.asm"
   ;PCI_Lib:
@@ -127,6 +130,7 @@ Data:
   Core_Stack_Physical_Address_Start dq 0
   Core_Stack_Physical_Address_End dq 0
   Core_Msg_Initing db "Initing core...", 13, 10, 0
+  Core_I_dont_know_this_CPU_Vendor_Msg db "I dont know this CPU Vendor: ", 0
 Data_end:
 
 ; Padding data -------------------------------------------------

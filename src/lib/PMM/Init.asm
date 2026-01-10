@@ -74,9 +74,9 @@ PMM_Init:
 
   PMM_Init_end:
     call PMM_Init_Replace_Types
-    call PMM_Print_Table_Descriptors
+    ;call PMM_Print_Table_Descriptors
     call PMM_Merge_Of_Regions
-    call PMM_Print_Table_Descriptors
+    ;call PMM_Print_Table_Descriptors
     call PMM_Clear_Empty_Regions
     call PMM_Print_Table_Descriptors
     ret

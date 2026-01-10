@@ -71,6 +71,7 @@ fi
 
 ##
 # qemu-system-x86_64 -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/OVMF.fd -hda OS.img -enable-kvm -m 512 -serial stdio -gdb tcp::1111 -S -serial tcp::2222,server,nowait
+# qemu-system-x86_64 -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/OVMF.fd -hda OS.img -enable-kvm -m 512
 # nc localhost 2222
 # gdb
 # target remote localhost:1111

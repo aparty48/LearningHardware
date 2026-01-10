@@ -1,6 +1,6 @@
-%include "src/lib/PMM/PMM_Allocate_Pages.asm"
+%include "src/lib/PMM/Allocate_Pages.asm"
 %include "src/lib/PMM/Clear_Empty_Regions.asm"
-%include "src/lib/PMM/PMM_Free_Pages.asm"
+%include "src/lib/PMM/Free_Pages.asm"
 %include "src/lib/PMM/Init.asm" 
 %include "src/lib/PMM/Merge_Of_Regions.asm"
 %include "src/lib/PMM/Print_Table_Descriptors.asm"
