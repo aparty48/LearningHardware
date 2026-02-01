@@ -39,6 +39,12 @@ Code:
     cmp rax, 1
     jne Core_I_dont_know_this_CPU_Vendor
     
+    mov rax, 1
+    mov rbx, 0xff
+    call PMM_Allocate_Pages
+    
+    call VMM_Create_Map
+    
     ;mov ebx, 0xff782317
     ;call DAE_FillDisplay
     
