@@ -39,17 +39,21 @@ Code:
     cmp rax, 1
     jne Core_I_dont_know_this_CPU_Vendor
     
-    mov rax, 4096
-    mov rbx, [Core_Stack_Physical_Address_Start]
-    mov cl, 3
-    call COM_Print_Block
+    call VMM_Init
     
     mov rax, 1
     mov rbx, 0xff
     call PMM_Allocate_Pages
-    call PMM_Print_Table_Descriptors
+    ;call DAE_Convert_DQ_To_HEX_Text
+    ;lea rbx, [DAE_HEX_Text]
+    ;call COM_Print
+    ;call PMM_Print_Table_Descriptors
     
-    ;call VMM_Create_Map
+    call VMM_Create_Map
+    mov rax, 4096
+    mov rbx, 0x0
+    mov cl, 3
+    call COM_Print_Block
     
     ;mov ebx, 0xff782317
     ;call DAE_FillDisplay

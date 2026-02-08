@@ -30,17 +30,31 @@ VMM_Create_Map:
 VMM_Create_Map_PLM4:
   ;Inp
   ;rax - pointer phys address to block bytes for plm4
-  ret
-  
+  VMM_CM_PLM4_Loop_Init:
+    xor rcx, rcx
+    
+  VMM_CM_PLM4_Loop:
+    cmp rcx, 512 * 8                                   ; 512 records of 8 byte each in table
+    jnb VMM_Create_Map_PLM4_End
+    
+    mov [rax + rcx], 0x0                               ; Empty entry in the table
+    
+  VMM_CM_PLM4_Loop_Inc:
+    add rcx, 8
+    jmp VMM_CM_PLM4_Loop
+    
+  VMM_Create_Map_PLM4_End:  
+    ret
+;----------------------------------
 VMM_Create_Map_PLM5:
   VMM_CM_PLM5_Loop_Init:
     xor rcx, rcx
     
   VMM_CM_PLM5_Loop:
-    cmp rcx, 512                                       ; 512 records in table
+    cmp rcx, 512 * 8                                   ; 512 records of 8 byte each in table
     je VMM_Create_Map_PLM5_End
     
-    mov qword [rax + rcx], 0x8000000000000000          ; Empty entry in the table
+    mov qword [rax + rcx], 0x0                         ; Empty entry in the table
     
   VMM_CM_PLM5_Loop_Inc:
     add rcx, 8
