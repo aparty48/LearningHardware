@@ -11,7 +11,7 @@ STANDARD_HEADER:
     .DOS_STUB                   times 64 db 0                                                       ; The DOS stub. Fill with zeros
     .PE_SIGNATURE               dd 'PE'                                                             ; This is the pe signature. The characters 'PE' followed by 2 null bytes
     .MACHINE_TYPE               dw 0x8664                                                           ; Targetting the x64 machine
-    .NUMBER_OF_SECTIONS         dw 2                                                                ; Number of sections. Indicates size of section table that immediately follows the headers
+    .NUMBER_OF_SECTIONS         dw 2;FILE_CODE_SECTIONS_COUNT + FILE_DATA_SECTIONS_COUNT              ; Number of sections. Indicates size of section table that immediately follows the headers
     .CREATED_DATE_TIME          dd 1754463360                                                       ; Number of seconds since 1970 since when the file was created
     .SYMBOL_TABLE_POINTER       dd 0x00                                                             ; Pointer to the symbol table. There should be no symbol table in an image so this is 0
     .NUMBER_OF_SYMBOLS          dd 0x00                                                             ; Because there are no symbol tables in an image
@@ -112,7 +112,7 @@ SECTION_HEADERS:
         .pointer_to_line_numbers    dd 0                ; There are no COFF line numbers
         .number_of_relocations      dw 0                ; Set to 0 for executable images
         .number_of_line_numbers     dw 0                ; Should be 0 for images
-        .characteristics            dd 0x70000020       ; Need to read up more on this
+        .characteristics            dd 0x60000020       ; Need to read up more on this
 
     SECTION_DATA:
         .name                       db ".data", 0x00, 0x00, 0x00
@@ -124,7 +124,7 @@ SECTION_HEADERS:
         .pointer_to_line_numbers    dd 0
         .number_of_relocations      dw 0
         .number_of_line_numbers     dw 0
-        .characteristics            dd 0xF0000040;0xD0000040
+        .characteristics            dd 0xC0000040;0xD0000040
 
     ;SECTION_RELOC:
         ;.name                       db ".reloc", 0x00, 0x00
@@ -136,13 +136,13 @@ SECTION_HEADERS:
         ;.pointer_to_line_numbers    dd 0
         ;.number_of_relocations      dw 0
         ;.number_of_line_numbers     dw 0
-        ;.characteristics            dd 0xC2000040 ;dd 0x42000040 ;
+        ;.characteristics            dd 0xF2000040 ;dd 0x42000040 ;
 
 times 4096-($-PE)   db 0
 HEADER_END:
 
 CODE:
-    ; The code begins here with the entry point
+    ; The code begins here with the entry point 
     EntryPoint:
         %include "src/EFI_Code.asm"
 CODE_END:

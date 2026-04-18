@@ -6,6 +6,14 @@ mov rax, [EFI_SYSTEM_TABLE]                                     ;get the EFI_SYS
 mov rax, [rax + EFI_SYSTEM_TABLE_BOOTSERVICES]                  ;get the EFI_SYSTEM_TABLE.BootServices 
 mov [EFI_BOOTSERVICES], rax                                     ;save result
 
+; new stack
+mov rax, 32
+mov rdx, 4
+call EFI_AllocatePages
+add rax, 32 * 4096
+mov rsp, rax
+;mov rbx, [Core_I_dont_know_this_CPU_Vendor_Msg]
+
 lea rdx, [EFI_Start]
 call EFI_WriteText
 
@@ -30,14 +38,14 @@ call DAE_FillDisplay
 mov rcx, [EFI_GOP_Mode_Info_Structure]
 xor rbx, rbx
 mov ebx, [rcx + 4]
-mov [DAE_Display_Heigth + 4], ebx
+mov [DAE_Display_Heigth ], rbx
 mov ebx, [rcx + 8]
-mov [DAE_Display_Width + 4], ebx
+mov [DAE_Display_Width], rbx
 mov ebx, [rcx + 0x0C]
 mov [DAE_Display_PixelFormat], ebx
 mov ebx, [rcx + 0x10]
 mov [DAE_Display_PixelInfo], ebx
-mov ebx, [rcx + 0x14]
+mov ebx, [rcx + 0x20]
 mov [DAE_Display_PixelPerScanLine], ebx
 
 ; Allocate memory for Core
@@ -111,3 +119,5 @@ call EFI_ExitBootServises
 mov rax, [Temp_Pointer_Init_Data_Structure]
 jmp [Temp_Core_Physical_Address]
 
+
+%include "src/lib/EFI/EFI_Code.asm"

@@ -37,28 +37,36 @@ CPUID_Where_i_am_launched:
     mov rax, 0
     ret
 ;------------------------------------
-CPUID_PLM5_Supporting:
+CPUID_PML5_Supporting:
   ;Out - rax: 0 - not suport, 1 - supported
   mov eax, [CPUID_Max_Pages]
   cmp eax, 0x7
-  jb CPUID_PLM5_Supporting_No
+  jb CPUID_PML5_Supporting_No
   
   mov eax, 7
   xor ecx, ecx
   cpuid
   
   bt ecx, 16
-  jnc CPUID_PLM5_Supporting_No
+  jnc CPUID_PML5_Supporting_No
   
   mov rax, 1                      ;supported
   ret
   
-  CPUID_PLM5_Supporting_No:
+  CPUID_PML5_Supporting_No:
     mov rax, 0
     ret
-  
-  
-  
+;----------------------------------------------
+CPUID_What_is_BitWidth_of_the_addr_bus:
+  xor rax, rax
+  xor rbx, rbx
+  xor rcx, rcx
+  xor rdx, rdx
+  mov eax, 0x80000008
+  cpuid
+  mov [CPUID_BitWidth_Phys_Address_Bus], al
+  mov [CPUID_BitWidth_Virt_Address_Bus], ah
+  ret
 ;------------------------------------
 %include "src/lib/CPUID/AMDParser.asm"
 %include "src/lib/CPUID/IntelParser.asm"

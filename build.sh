@@ -27,7 +27,7 @@ if [ "$BOOTX64_EFI_BUILD_MODE" -eq 0 ]; then
 		"$PROJECT_DIR$CHECKSUM_LOCAL_BIN" "$PROJECT_DIR$BOOTX64_EFI_OUT_FILE"
 		EXIT_CODE=$?
 		if [ "$EXIT_CODE" -eq 0 ]; then 
-			echo "Success." 
+			echo "Success" 
 		fi
 	fi
 fi
@@ -44,7 +44,7 @@ if [ "$BOOTX64_EFI_BUILD_MODE" -eq 1 ]; then
 			"$OBJCOPY_BIN" -j .text -j data --target=efi-app-x86-64 "$PROJECT_DIR$BOOTX64_DBG_ELF_TMP_FILE" -O "$PROJECT_DIR$BOOTX64_EFI_OUT_FILE"
 			EXIT_CODE=$?
 			if [ "$EXIT_CODE" -eq 0 ]; then
-				echo "Success." 
+				echo "Success" 
 			fi
 		fi
 		
@@ -71,6 +71,8 @@ fi
 
 ##
 # qemu-system-x86_64 -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/OVMF.fd -hda OS.img -enable-kvm -m 512 -serial stdio -gdb tcp::1111,wait -S -serial tcp::2222,server,nowait
+# qemu-system-x86_64 -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/OVMF.fd -hda OS.img -enable-kvm -m 512 -serial stdio -vga std -global bosch-display.vgamemmb=32
+# qemu-system-x86_64 -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/OVMF.fd -hda OS.img -enable-kvm -m 512 -serial stdio
 # qemu-system-x86_64 -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/OVMF.fd -hda OS.img -enable-kvm -m 512
 # nc localhost 2222
 # gdb

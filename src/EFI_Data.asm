@@ -1,5 +1,5 @@
-EFI:
-%include "src/lib/EFI.asm"
+EFI_Data:
+%include "src/lib/EFI/EFI_Data.asm"
 
 Core:
 %include "src/Core.asm"

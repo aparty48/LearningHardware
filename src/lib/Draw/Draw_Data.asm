@@ -7,11 +7,11 @@ DAE_FrameBufferSize   dq 0           ;Size BF
 DAE_HEX_Text          dq 0, 0        ;Text, 64 bit in format HEX, after converting
                       db 0
 DAE_Hello_World       db "Hello World!", 0
-DAE_Display_Heigth            dq 640
-DAE_Display_Width             dq 800
+DAE_Display_Heigth            dq 0
+DAE_Display_Width             dq 0
 DAE_Display_PixelFormat       dd 0
 DAE_Display_PixelInfo         dd 0
-DAE_Display_PixelPerScanLine  dd 1024
+DAE_Display_PixelPerScanLine  dd 0
 
 DAE_Chars:
   %include "src/CharsTable.asm"

@@ -171,3 +171,8 @@ PMM_Init_Replace_Types:
     PMM_Init_Replace_Types_end:
       ret
     
+%include "src/lib/PMM/PMM_Allocate_Pages.asm"
+%include "src/lib/PMM/PMM_Clear_Empty_Regions.asm"
+%include "src/lib/PMM/PMM_Free_Pages.asm"
+%include "src/lib/PMM/PMM_Merge_Of_Regions.asm"
+%include "src/lib/PMM/PMM_Print_Table_Descriptors.asm"
